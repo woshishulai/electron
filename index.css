@@ -1,0 +1,13 @@
+.custom-menu{
+    height: 50px;
+    width: 100%;
+    background-color: pink; 
+    /* 可自定义拖拽窗口 */
+    -webkit-app-region:drag;
+    -webkit-app-region: drag;
+    /* 可以参考https://www.bilibili.com/video/BV1Wo4y1X7cg/?spm_id_from=333.337.search-card.all.click&vd_source=67c3ee11258bbee9e952730d11011b07第38分视频 */
+}
+.custom-menu ul li {
+    /* 要清楚掉 否则新开窗口功能不能生效 */
+    -webkit-app-region: no-drag;
+}

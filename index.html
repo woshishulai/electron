@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>electron</title>
+</head>
+<body>
+    <div class="custom-menu">
+        <ul>
+            <li class="new-win">
+                点击新打开窗口
+            </li>
+            <li>
+                <a href="">点击在窗口内打开浏览器</a>
+            </li>
+            <li>
+                <a href="">点击打开谷歌内打开浏览器</a>
+            </li>
+        </ul>
+    </div>
+    <!-- 读取文件 -->
+    <button onclick="openFile()">读取本地文件</button>
+    <button onclick="saveFile()">保存文件</button>
+    <button onclick="maxWindow()">窗口最大化</button>
+    <script>
+        //渲染进程使用主进程的方法创建窗口
+        const {remote:{BrowserWindow,dialog,globalShortcut},shell,ipcRenderer} = require('electron')
+        const fs = require('fs')
+        const newWin = document.querySelector('.new-win')
+        newWin.onClick=function () {
+            new BrowserWindow({
+                width:500,
+                height:300
+            })
+        }
+        //新建窗口 
+        const navA =document.querySelectorAll('a')
+        navA.forEach(item =>{
+          item.onclick = function (e) {
+            //阻止默认跳转
+            e.preventDefault()
+            //打开浏览器
+            shell.openExternal(item.href)
+          }
+        })
+        //读取文件 打开对话框 展示文件
+        const openFile = function () {
+        const res =  dialog.showOpenDialogSync({
+            title:'读取文件',
+            buttonLabel:'按钮的文字',
+            //控制选择的文件类型 后缀名不再数组内的不展示 
+            filters:[
+                {
+                    name:'Images',extensions:['img']
+                },
+                {
+                    name:'js',extensions:['js']
+                },
+            ]
+         })
+         //这个res就是上传的文件信息 里面的第一项就是node的文件路径
+         console.log(res[0]);
+         //通过node读取文件  这时候得到的是2进制的文件 转换成字符串
+         const filesContent=fs.readFileSync(res[0]).toString()
+         console.log(filesContent);
+        }
+                 //接下来修改读取文件的信息 在保存
+                 const saveFile = function () {
+            //保存文件的路径 格式 后缀
+          const res=  dialog.showSaveDialogSync({
+                title:'读取文件',
+            buttonLabel:'按钮的文字',
+            //控制选择的文件类型 后缀名不再数组内的不展示 
+            filters:[
+                {
+                    name:'Images',extensions:['img']
+                },
+                {
+                    name:'js',extensions:['js']
+                },
+            ]
+            })
+            //路径和文本框的值
+            fs.writeFileSync(res,textareaEl.value)
+            console.log(res);
+         }
+         //渲染进程自定义快捷键
+         
+         // 渲染和主进程通信 记得清楚样式拖拽
+         let windowsSize = 'unmax-window'
+         const maxWindow = function (){
+            //触发事件
+            windowsSize = windowsSize === 'unmax-window'?'max-window':'unmax-window'
+            ipcRenderer.send('max-window')
+         }
+    </script>
+</body>
+</html>
